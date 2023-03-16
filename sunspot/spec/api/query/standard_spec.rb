@@ -1,26 +1,26 @@
 require File.expand_path('spec_helper', File.dirname(__FILE__))
 
-describe 'standard query', :type => :query do
-  it_should_behave_like "scoped query"
-  it_should_behave_like "query with advanced manipulation"
-  it_should_behave_like "query with connective scope"
-  it_should_behave_like "query with connective scope and boost"
-  it_should_behave_like "query with dynamic field support"
-  it_should_behave_like "facetable query"
-  it_should_behave_like "fulltext query"
-  it_should_behave_like "query with highlighting support"
-  it_should_behave_like "sortable query"
-  it_should_behave_like "query with text field scoping"
-  it_should_behave_like "geohash query"
-  it_should_behave_like "spatial query"
-  it_should_behave_like "stats query"
-  it_should_behave_like "spellcheck query"
+describe 'standard query', type: :query do
+  it_should_behave_like 'scoped query'
+  it_should_behave_like 'query with advanced manipulation'
+  it_should_behave_like 'query with connective scope'
+  it_should_behave_like 'query with connective scope and boost'
+  it_should_behave_like 'query with dynamic field support'
+  it_should_behave_like 'facetable query'
+  it_should_behave_like 'fulltext query'
+  it_should_behave_like 'query with highlighting support'
+  it_should_behave_like 'sortable query'
+  it_should_behave_like 'query with text field scoping'
+  it_should_behave_like 'geohash query'
+  it_should_behave_like 'spatial query'
+  it_should_behave_like 'stats query'
+  it_should_behave_like 'spellcheck query'
 
   it 'adds a no-op query to :q parameter when no :q provided' do
     session.search Post do
       with :title, 'My Pet Post'
     end
-    expect(connection).to have_last_search_with(:q => '*:*')
+    expect(connection).to have_last_search_with(q: '*:*')
   end
 
   it 'adds a no-op query to :q parameter when only a boost query provided' do
@@ -29,7 +29,7 @@ describe 'standard query', :type => :query do
         with :title, 'My Pet Post'
       end
     end
-    expect(connection).to have_last_search_with(:q => '*:*')
+    expect(connection).to have_last_search_with(q: '*:*')
   end
 
   private

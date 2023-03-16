@@ -10,38 +10,38 @@ shared_examples_for 'geohash query' do
 
   it 'searches for nearby points with non-Float arguments' do
     search do
-      with(:coordinates).near(BigDecimal.new('40.7'), BigDecimal.new('-73.5'))
+      with(:coordinates).near(BigDecimal('40.7'), BigDecimal('-73.5'))
     end
     expect(connection).to have_last_search_including(:q, build_geo_query)
   end
 
   it 'searches for nearby points with given precision' do
     search do
-      with(:coordinates).near(40.7, -73.5, :precision => 10)
+      with(:coordinates).near(40.7, -73.5, precision: 10)
     end
-    expect(connection).to have_last_search_including(:q, build_geo_query(:precision => 10))
+    expect(connection).to have_last_search_including(:q, build_geo_query(precision: 10))
   end
 
   it 'searches for nearby points with given precision factor' do
     search do
-      with(:coordinates).near(40.7, -73.5, :precision_factor => 1.5)
+      with(:coordinates).near(40.7, -73.5, precision_factor: 1.5)
     end
-    expect(connection).to have_last_search_including(:q, build_geo_query(:precision_factor => 1.5))
+    expect(connection).to have_last_search_including(:q, build_geo_query(precision_factor: 1.5))
   end
 
   it 'searches for nearby points with given boost' do
     search do
-      with(:coordinates).near(40.7, -73.5, :boost => 2.0)
+      with(:coordinates).near(40.7, -73.5, boost: 2.0)
     end
-    expect(connection).to have_last_search_including(:q, build_geo_query(:boost => 2.0))
+    expect(connection).to have_last_search_including(:q, build_geo_query(boost: 2.0))
   end
 
   it 'performs both dismax search and location search' do
     search do
-      fulltext 'pizza', :fields => :title
+      fulltext 'pizza', fields: :title
       with(:coordinates).near(40.7, -73.5)
     end
-    expected = %Q((_query_:"{!edismax qf='title_text'}pizza" AND (#{build_geo_query})))
+    expected = %((_query_:"{!edismax qf='title_text'}pizza" AND (#{build_geo_query})))
     expect(connection).to have_last_search_including(:q, expected)
   end
 
@@ -55,9 +55,10 @@ shared_examples_for 'geohash query' do
     (precision..12).map do |i|
       phrase =
         if i == 12 then hash
-        else "#{hash[0, i]}*"
+        else
+          "#{hash[0, i]}*"
         end
-      precision_boost = Sunspot::Util.format_float(boost*precision_factor**(i-12.0), 3)
+      precision_boost = Sunspot::Util.format_float(boost * precision_factor**(i - 12.0), 3)
       "coordinates_s:#{phrase}^#{precision_boost}"
     end.reverse.join(' OR ')
   end
