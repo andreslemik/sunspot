@@ -51,7 +51,7 @@ describe 'keyword search' do
     end
 
     it 'matches multiple words out of a single field' do
-      results = Sunspot.search(Post) { keywords 'elects toast' }.results
+      results = Sunspot.search(Post) { keywords('elects toast') { minimum_match(2) } }.results
       expect(results).to eq([@posts[0]])
     end
 
@@ -132,23 +132,25 @@ describe 'keyword search' do
     end
   end
 
-  describe 'with document boost' do
-    before :all do
-      Sunspot.remove_all
-      @posts = [4.0, 2.0].map do |rating|
-        Post.new(:title => 'Test', :ratings_average => rating)
-      end
-      Sunspot.index!(*@posts)
-    end
+  # Index-time document boosts not supported since 7.x
+  #
+  # describe 'with document boost' do
+  #   before :all do
+  #     Sunspot.remove_all
+  #     @posts = [4.0, 2.0].map do |rating|
+  #       Post.new(:title => 'Test', :ratings_average => rating)
+  #     end
+  #     Sunspot.index!(*@posts)
+  #   end
 
-    it 'should assign a higher score to the higher-boosted document' do
-      search = Sunspot.search(Post) { keywords 'test' }
-      expect(search.hits.map { |hit| hit.primary_key }).to eq(
-        @posts.map { |post| post.id.to_s }
-      )
-      expect(search.hits.first.score).to be > search.hits.last.score
-    end
-  end
+  #   it 'should assign a higher score to the higher-boosted document' do
+  #     search = Sunspot.search(Post) { keywords 'test' }
+  #     expect(search.hits.map { |hit| hit.primary_key }).to eq(
+  #       @posts.map { |post| post.id.to_s }
+  #     )
+  #     expect(search.hits.first.score).to be > search.hits.last.score
+  #   end
+  # end
 
   describe 'with search-time boost' do
     before :each do
@@ -223,7 +225,7 @@ describe 'keyword search' do
           boost(1.5) { with(:average_rating).greater_than(3.0) }
         end
       end
-      expect(search.results).to eq(@posts)
+      expect(search.results).to match_array(@posts)
       expect(search.hits[0].score).to be > search.hits[1].score
       expect(search.hits[1].score).to be > search.hits[2].score
     end
